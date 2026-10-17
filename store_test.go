@@ -20,7 +20,7 @@ func TestKeys_ReturnsSortedKeys(t *testing.T) {
 	}
 }
 
-func TestKeysEmptyStore(t *testing.T) {
+func TestKeys_EmptyStore(t *testing.T) {
 	store := NewStore(5)
 
 	got := store.Keys()
@@ -30,7 +30,7 @@ func TestKeysEmptyStore(t *testing.T) {
 	}
 }
 
-func TestGetEmpty(t *testing.T) {
+func TestGet_Empty(t *testing.T) {
 	store := NewStore(5)
 
 	if _, err := store.Get(""); err == nil || !errors.Is(err, ErrEmptyKey) {
@@ -48,4 +48,26 @@ func TestSetGet_RoundTrip(t *testing.T) {
 	if missingVal, err := store.Get("missing"); err == nil || missingVal != "" {
 		t.Errorf("Get() should return empty string & error")
 	}
+}
+
+func TestSet_OverMaxSize(t *testing.T) {
+	store := NewStore(2)
+
+	store.Set("a", "alpha")
+	store.Set("b", "bravo")
+
+	if err := store.Set("c", "charlie"); err == nil && errors.Is(err, ErrStoreFull) {
+		t.Errorf("Set() inserted over max size should return store full error")
+	}
+}
+
+func TestSet_UpdatesAtMaxSize(t *testing.T) {
+	store := NewStore(2)
+
+	store.Set("a", "alpha")
+	store.Set("b", "bravo")
+	if err := store.Set("b", "beta"); err != nil {
+		t.Errorf("Set() should update existing key at max size")
+	}
+
 }
