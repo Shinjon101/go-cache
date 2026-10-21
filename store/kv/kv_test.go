@@ -1,9 +1,11 @@
-package main
+package kv
 
 import (
 	"errors"
 	"reflect"
 	"testing"
+
+	cachestore "github.com/Shinjon101/go-cache/store"
 )
 
 func TestKeys_ReturnsSortedKeys(t *testing.T) {
@@ -33,7 +35,7 @@ func TestKeys_EmptyStore(t *testing.T) {
 func TestGet_Empty(t *testing.T) {
 	store := NewStore(5)
 
-	if _, err := store.Get(""); err == nil || !errors.Is(err, ErrEmptyKey) {
+	if _, err := store.Get(""); err == nil || !errors.Is(err, cachestore.ErrEmptyKey) {
 		t.Errorf("Get() should return error for passing empty string")
 	}
 }
@@ -56,7 +58,7 @@ func TestSet_OverMaxSize(t *testing.T) {
 	store.Set("a", "alpha")
 	store.Set("b", "bravo")
 
-	if err := store.Set("c", "charlie"); err == nil && errors.Is(err, ErrStoreFull) {
+	if err := store.Set("c", "charlie"); err == nil || !errors.Is(err, cachestore.ErrStoreFull) {
 		t.Errorf("Set() inserted over max size should return store full error")
 	}
 }

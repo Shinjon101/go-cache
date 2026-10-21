@@ -1,13 +1,11 @@
-package main
+package kv
 
 import (
-	"errors"
 	"fmt"
 	"sort"
-)
 
-var ErrEmptyKey = errors.New("Empty Key")
-var ErrStoreFull = errors.New("Store is full")
+	"github.com/Shinjon101/go-cache/store"
+)
 
 type Store struct {
 	data    map[string]string
@@ -23,7 +21,7 @@ func NewStore(maxSize int) *Store {
 
 func (s *Store) Get(key string) (string, error) {
 	if key == "" {
-		return "", ErrEmptyKey
+		return "", store.ErrEmptyKey
 	}
 	val, ok := s.data[key]
 
@@ -36,11 +34,11 @@ func (s *Store) Get(key string) (string, error) {
 
 func (s *Store) Set(key string, value string) error {
 	if key == "" {
-		return ErrEmptyKey
+		return store.ErrEmptyKey
 	}
 	_, exists := s.data[key]
 	if s.maxSize > 0 && s.Len() >= s.maxSize && !exists {
-		return fmt.Errorf("Set(%s): %w", key, ErrStoreFull)
+		return fmt.Errorf("Set(%s): %w", key, store.ErrStoreFull)
 	}
 
 	s.data[key] = value
