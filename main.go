@@ -12,14 +12,16 @@ import (
 type Storer interface {
 	Get(string) (string, error)
 	Set(string, string) error
+	Keys() []string
+	Delete(string)
 }
 
-func GetEncryptedValue(store Storer, key string, value string) (string, error) {
+func GetEncryptedValue(storer Storer, key string, value string) (string, error) {
 	encoded := base64.StdEncoding.EncodeToString([]byte(value))
-	if err := store.Set(key, encoded); err != nil {
+	if err := storer.Set(key, encoded); err != nil {
 		return "", fmt.Errorf("Error while setting value %v", err)
 	}
-	return store.Get(key)
+	return storer.Get(key)
 }
 
 func main() {
