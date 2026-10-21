@@ -2,6 +2,7 @@ package ttl
 
 import (
 	"errors"
+	"sort"
 	"time"
 
 	"github.com/Shinjon101/go-cache/store"
@@ -51,4 +52,26 @@ func (t *TtlStore) Set(key string, value string) error {
 	}
 
 	return nil
+}
+
+func (t *TtlStore) Delete(key string) {
+	delete(t.data, key)
+}
+
+func (t *TtlStore) Keys() []string {
+	keys := make([]string, 0, len(t.data))
+
+	for key := range t.data {
+		entry, ok := t.data[key]
+		if !ok || time.Now().After(entry.expiresAt) {
+			delete(t.data, key)
+		} else {
+			keys = append(keys, key)
+		}
+
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
+	return keys
 }
