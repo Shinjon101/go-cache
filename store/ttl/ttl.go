@@ -75,3 +75,7 @@ func (t *TtlStore) Keys() []string {
 	})
 	return keys
 }
+
+func (t *TtlStore) Len() int {
+	return len(t.data)
+}
