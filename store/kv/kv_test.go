@@ -73,3 +73,24 @@ func TestSet_UpdatesAtMaxSize(t *testing.T) {
 	}
 
 }
+func TestClone_ClonesOriginal(t *testing.T) {
+	store := NewStore(2)
+
+	store.Set("a", "alpha")
+	clone := store.Clone()
+
+	if val, err := clone.Get("a"); err != nil || val != "alpha" {
+		t.Errorf("Clone() should clone original store with existing keys and values")
+	}
+}
+func TestClone_OriginalNotMuttable(t *testing.T) {
+	store := NewStore(2)
+
+	store.Set("a", "alpha")
+	clone := store.Clone()
+	clone.Set("b", "bravo")
+
+	if val, err := store.Get("b"); err == nil || val == "bravo" {
+		t.Errorf("Clone() should not mutate original")
+	}
+}
